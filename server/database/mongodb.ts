@@ -42,7 +42,7 @@ export async function connectDB() {
     };
 
     cached.promise = mongoose.connect(
-      MONGODB_URI,
+      MONGODB_URI as string,
 
       opts,
     );
