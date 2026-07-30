@@ -1,53 +1,57 @@
-import { InferSchemaType, Schema, model, models } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
 export enum BookingStatus {
   BOOKED = "BOOKED",
-  ORDER_CREATED = "ORDER_CREATED",
+
+  COMPLETED = "COMPLETED",
+
   CANCELLED = "CANCELLED",
 }
 
-const ServiceSchema = new Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+interface BookingService {
+  serviceId: string;
 
-    price: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
+  name: string;
 
-    duration: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-  },
-  {
-    _id: false,
-  }
-);
+  price: number;
+}
 
-const BookingSchema = new Schema(
+export interface BookingDocument extends Document {
+  customerName: string;
+
+  services: BookingService[];
+
+  totalPrice: number;
+
+  appointmentAt: Date;
+
+  status: BookingStatus;
+
+  orderId?: string;
+
+  completedAt?: Date;
+}
+
+const BookingSchema = new Schema<BookingDocument>(
   {
     customerName: {
       type: String,
       required: true,
-      trim: true,
     },
 
-    employeeName: {
-      type: String,
+    services: [
+      {
+        serviceId: String,
+
+        name: String,
+
+        price: Number,
+      },
+    ],
+
+    totalPrice: {
+      type: Number,
       required: true,
-      trim: true,
-    },
-
-    services: {
-      type: [ServiceSchema],
-      default: [],
     },
 
     appointmentAt: {
@@ -61,18 +65,15 @@ const BookingSchema = new Schema(
       default: BookingStatus.BOOKED,
     },
 
-    orderId: {
-      type: Schema.Types.ObjectId,
-      ref: "Order",
-      default: null,
-    },
+    orderId: String,
+
+    completedAt: Date,
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-export type BookingDocument = InferSchemaType<typeof BookingSchema>;
-
 export const Booking =
-  models.Booking || model("Booking", BookingSchema);
+  mongoose.models.Booking ||
+  mongoose.model<BookingDocument>("Booking", BookingSchema);

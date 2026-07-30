@@ -1,37 +1,4 @@
-import { InferSchemaType, Schema, model, models } from "mongoose";
-
-export enum OrderStatus {
-  DRAFT = "DRAFT",
-  COMPLETED = "COMPLETED",
-  CANCELLED = "CANCELLED",
-}
-
-const OrderItemSchema = new Schema(
-  {
-    serviceName: {
-      type: String,
-      required: true,
-    },
-
-    quantity: {
-      type: Number,
-      default: 1,
-    },
-
-    unitPrice: {
-      type: Number,
-      required: true,
-    },
-
-    duration: {
-      type: Number,
-      required: true,
-    },
-  },
-  {
-    _id: false,
-  }
-);
+import { Schema, model, models } from "mongoose";
 
 const OrderSchema = new Schema(
   {
@@ -41,24 +8,9 @@ const OrderSchema = new Schema(
       required: true,
     },
 
-    customerName: {
-      type: String,
-      required: true,
-    },
-
-    employeeName: {
-      type: String,
-      required: true,
-    },
-
-    items: {
-      type: [OrderItemSchema],
-      default: [],
-    },
-
     subtotal: {
       type: Number,
-      default: 0,
+      required: true,
     },
 
     discount: {
@@ -68,26 +20,25 @@ const OrderSchema = new Schema(
 
     tax: {
       type: Number,
-      default: 0,
+      required: true,
     },
 
     total: {
       type: Number,
-      default: 0,
+      required: true,
     },
 
     status: {
       type: String,
-      enum: Object.values(OrderStatus),
-      default: OrderStatus.DRAFT,
+      enum: ["PAID", "CANCELLED"],
+      default: "PAID",
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-export type OrderDocument = InferSchemaType<typeof OrderSchema>;
+const Order = models.Order || model("Order", OrderSchema);
 
-export const Order =
-  models.Order || model("Order", OrderSchema);
+export default Order;
