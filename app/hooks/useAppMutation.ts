@@ -4,10 +4,21 @@ import { useToast } from "@/contexts/ToastContext";
 
 export function useAppMutation<
   TData = unknown,
+  TError = unknown,
   TVariables = unknown,
-  TError = any,
->(options: UseMutationOptions<TData, TError, TVariables>) {
+  TContext = unknown,
+>(options: UseMutationOptions<TData, TError, TVariables, TContext>) {
   const { success, error } = useToast();
+
+  const getErrorMessage = (e: unknown): string => {
+    if (!e) return "Something went wrong";
+    if (typeof e === "string") return e;
+    if (typeof e === "object" && e !== null && "message" in e) {
+      const maybeMessage = (e as { message?: unknown }).message;
+      if (typeof maybeMessage === "string") return maybeMessage;
+    }
+    return "Something went wrong";
+  };
 
   return useMutation({
     ...options,
@@ -15,13 +26,25 @@ export function useAppMutation<
     onSuccess: (data, variables, context) => {
       success("Operation successfully");
 
-      options.onSuccess?.(data, variables, context);
+      if (options.onSuccess) {
+        (options.onSuccess as unknown as (...args: unknown[]) => void)(
+          data,
+          variables,
+          context,
+        );
+      }
     },
 
     onError: (err, variables, context) => {
-      error(err?.message ?? "Something went wrong");
+      error(getErrorMessage(err));
 
-      options.onError?.(err, variables, context);
+      if (options.onError) {
+        (options.onError as unknown as (...args: unknown[]) => void)(
+          err,
+          variables,
+          context,
+        );
+      }
     },
   });
 }

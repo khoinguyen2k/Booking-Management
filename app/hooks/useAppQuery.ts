@@ -7,7 +7,7 @@ import { useToast } from "@/contexts/ToastContext";
 export function useAppQuery<TData = unknown, TError = AxiosError>(
   options: UseQueryOptions<TData, TError>,
 ) {
-  const { showError } = useToast();
+  const { error: showError } = useToast();
 
   return useQuery({
     ...options,
@@ -16,7 +16,18 @@ export function useAppQuery<TData = unknown, TError = AxiosError>(
 
     meta: {
       onError: (error: TError) => {
-        const message = (error as any)?.message ?? "Something went wrong";
+        let message = "Something went wrong";
+        if (error) {
+          if (typeof error === "string") message = error;
+          else if (
+            typeof error === "object" &&
+            error !== null &&
+            "message" in error
+          ) {
+            const m = (error as { message?: unknown }).message;
+            if (typeof m === "string") message = m;
+          }
+        }
 
         showError(message);
       },

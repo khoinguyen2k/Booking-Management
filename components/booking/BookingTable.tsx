@@ -118,7 +118,7 @@ export default function BookingTable({
 
       render: (_, record) =>
         record.status === "BOOKED" ? (
-          <CheckoutButton bookingId={record._id} />
+          <CheckoutButton bookingId={String(record._id)} />
         ) : null,
     },
   ];
@@ -132,7 +132,7 @@ export default function BookingTable({
 
         loading={loading}
 
-        rowKey="_id"
+        rowKey={(record: BookingDocument) => String(record._id)}
 
         onChange={onTableChange}
 

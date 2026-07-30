@@ -30,9 +30,12 @@ export class CheckoutService {
 
     // 3. Calculate subtotal
 
-    const subtotal = booking.services.reduce((total, service) => {
-      return total + service.price;
-    }, 0);
+    const subtotal = booking.services.reduce(
+      (total: number, service: { price: number }) => {
+        return total + service.price;
+      },
+      0,
+    );
 
     if (subtotal <= 0) {
       throw new AppError("Invalid booking price", 400);

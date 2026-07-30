@@ -41,7 +41,7 @@ export default function BookingCardList({
       {loading && <div>Loading...</div>}
 
       {data.map((booking) => (
-        <Card key={booking._id}>
+        <Card key={String(booking._id)}>
           <div className="space-y-3">
             <div className="flex justify-between">
               <Text strong>{booking.customerName}</Text>
@@ -68,7 +68,7 @@ export default function BookingCardList({
             </div>
 
             {booking.status === "BOOKED" && (
-              <CheckoutButton bookingId={booking._id} />
+              <CheckoutButton bookingId={String(booking._id)} />
             )}
           </div>
         </Card>

@@ -11,7 +11,7 @@ interface Props<T> {
 
   loading?: boolean;
 
-  rowKey: string;
+  rowKey: string | ((record: T) => string);
 
   onChange?: TableProps<T>["onChange"];
 

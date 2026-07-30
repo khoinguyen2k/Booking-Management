@@ -1,8 +1,8 @@
 import { Booking, BookingStatus } from "@/server/models/booking.model";
 
-import { ServiceDocument } from "@/server/models/service.model";
+import type { IService } from "@/server/models/service.model";
 
-export async function seedBookings(serviceCatalog: ServiceDocument[]) {
+export async function seedBookings(serviceCatalog: IService[]) {
   await Booking.deleteMany({});
 
   const customers = [

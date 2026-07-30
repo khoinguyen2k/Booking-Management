@@ -10,6 +10,12 @@ interface Props {
   onSuccess?: () => void;
 }
 
+type FormValues = {
+  customerName: string;
+  serviceIds: Array<string | number>;
+  appointmentAt: { toISOString: () => string } | Date | string;
+};
+
 export default function BookingForm({ onSuccess }: Props) {
   const [form] = Form.useForm();
 
@@ -21,14 +27,21 @@ export default function BookingForm({ onSuccess }: Props) {
     isPending,
   } = useCreateBooking();
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: FormValues) => {
+    const appointmentIso =
+      typeof values.appointmentAt === "string"
+        ? values.appointmentAt
+        : values.appointmentAt instanceof Date
+          ? values.appointmentAt.toISOString()
+          : values.appointmentAt.toISOString();
+
     mutate(
       {
         customerName: values.customerName,
 
-        serviceIds: values.serviceIds,
+        serviceIds: values.serviceIds.map(String),
 
-        appointmentAt: values.appointmentAt.toISOString(),
+        appointmentAt: appointmentIso,
       },
       {
         onSuccess: () => {
@@ -69,7 +82,7 @@ export default function BookingForm({ onSuccess }: Props) {
           <Checkbox.Group className="w-full">
             <div className="flex flex-col gap-3">
               {services?.map((service) => (
-                <Checkbox key={service._id} value={service._id}>
+                <Checkbox key={String(service._id)} value={String(service._id)}>
                   <div className="flex w-full justify-between">
                     <span>{service.name}</span>
 
